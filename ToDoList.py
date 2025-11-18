@@ -14,18 +14,19 @@ def saveData(data):
     with open('data.json', 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
 
-def addEntry(task):
+def addEntry(task,category):
     data = loadData()
     entry = {
         'task': task,
         'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'category': category
 
     }
     data.append(entry)
     saveData(data)
     print("✅ Task added successfully!")
 
-def filterbydate(inputDate):
+def filterbydate(inputDate,):
     data = loadData()
     filteredData = []
     for entry in data:
@@ -37,6 +38,20 @@ def filterbydate(inputDate):
             print(f"{i}. {entry['task']} ({entry['timestamp']})")
     else: print('No match Data found')
 
+
+
+def filterbycategory(inputCategory):
+    data = loadData()
+    filteredCategories = []
+
+    for cate in data:
+        if cate['category'] == inputCategory:
+            filteredCategories.append(cate)
+    if len(filteredCategories) > 0:
+            for i,entry in enumerate(filteredCategories, 1):
+                print(f"{i}.{entry['task']} ({entry['timestamp']}) {entry['category']} ")
+    else:
+        print('No match Data found')
 
 
 def deleteEntry():
@@ -68,7 +83,7 @@ def showEntry():
         print('i dont have data yet')
         return
     for i , entry in enumerate(data,1):
-        print(f"{i}. {entry['task']} ({entry['timestamp']})")
+        print(f"{i}. {entry['task']} ({entry['timestamp']}) - {entry['category']}")
 
 def editTasks():
     data = loadData()
@@ -97,14 +112,18 @@ while True:
     print("3. Edit tasks")
     print("4. Delete a task")
     print("5. Show stats")
-    print("6. Filter by date")
+    print("6. Filter ")
     print("7. Exit")
 
     choice = input("Choose an option: ")
 
+
+
+
     if choice == "1":
         task = input("Enter your task: ")
-        addEntry(task)
+        category = input("Enter your category: ")
+        addEntry(task,category)
     elif choice == "2":
         showEntry()
     elif choice == "3":
@@ -114,8 +133,19 @@ while True:
     elif choice == "5":
         stats()
     elif choice == "6":
-        inputDate = input("Enter the date of your task: ")
-        filterbydate(inputDate)
+        print("\n1. Filter by date")
+        print("2. Filter by category")
+        select=input('Choose your type of filter: ')
+
+
+        if select=='1':
+            inputDate = input("Enter the date of your task: ")
+            filterbydate(inputDate)
+        elif select=='2':
+            inputCategory = input("Enter the category of your task: ")
+            filterbycategory(inputCategory)
+
+
     elif choice == "7":
         print("Goodbye!")
         break
