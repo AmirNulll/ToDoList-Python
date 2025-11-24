@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-CategoryList = ['anime', 'game', 'movie', 'work']
+# CategoryList = ['anime', 'game', 'movie', 'work']
 
 
 def loadData():
@@ -11,6 +11,22 @@ def loadData():
     except FileNotFoundError:
         return []
 
+def categoryDataLoad():
+    try:
+        with open('Category.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+def categoryDataSave(category):
+    with open('Category.json', 'w', encoding='utf-8') as f:
+        json.dump(category, f, ensure_ascii=False, indent=4)
+
+def addCategory(categoryList):
+    categoryData = categoryDataLoad()
+    catEntry=categoryList
+    categoryData.append(catEntry)
+    categoryDataSave(categoryData)
 
 
 def saveData(data):
@@ -19,10 +35,11 @@ def saveData(data):
 
 def addEntry(task,Categoryselect):
     data = loadData()
+    CategoryData = categoryDataLoad()
     entry = {
         'task': task,
         'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'category': CategoryList[Categoryselect-1]
+        'category': CategoryData[Categoryselect-1]
 
     }
     data.append(entry)
@@ -89,12 +106,14 @@ def showEntry():
         print(f"{i}. {entry['task']} ({entry['timestamp']}) - {entry['category']}")
 
 def showCategories():
-    for i, c in enumerate(CategoryList, 1):
-        print(f"{i}. {c.capitalize()}")
+    catData = categoryDataLoad()
+    for i, c in enumerate(catData,1):
+        print(f'{i}.{c}')
 
 
 def editTasksAndCategory():
     data = loadData()
+    catData = categoryDataLoad()
     if not data:
         print("No tasks to Edit!")
         return
@@ -106,6 +125,7 @@ def editTasksAndCategory():
 
             print('\n1.Cahnge the Task')
             print('2.Cange the Category')
+            print('3.Add new Category')
             selectSection=input('What would you like to do?')
 
 
@@ -119,10 +139,14 @@ def editTasksAndCategory():
                 showCategories()
                 EditCategory=int(input("Enter the new number of category: "))
                 old=changed['category']
-                changed['category'] = CategoryList[EditCategory-1]
+                changed['category'] = catData[EditCategory-1]
                 saveData(data)
-                print(f'Category updated: {old} → {CategoryList[EditCategory-1]}')
-
+                print(f'Category updated: {old} → {catData[EditCategory-1]}')
+            elif selectSection=='3':
+                # categoryData=categoryDataLoad()
+                categoryList=input("Enter the new category: ")
+                addCategory(categoryList)
+                print('Category added successfully!')
 
         else:
             print("Invalid number!")
@@ -147,13 +171,17 @@ while True:
 
     if choice == "1":
         task = input("Enter your task: ")
+        categoryData = categoryDataLoad()
+
 
         showCategories()
+
+        # categoryData=categoryDataLoad()
 
         while True:
             try:
                 Categoryselect = int(input("Enter your number of category: "))
-                if 1 <= Categoryselect <= len(CategoryList):
+                if 1 <= Categoryselect <= len(categoryData):
                     break
                 else:
                     print("❌ Invalid number, try again.")
